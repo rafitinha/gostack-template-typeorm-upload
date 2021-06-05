@@ -15,11 +15,13 @@ class ImportTransactionsService {
 
     const transactionArray: Transaction[] = await this.loadCSV(cvsFileName);
 
+    const createCategoryService = new CreateCategoryService();
+
     const transactionsArray = transactionArray.map(
       async (item: Transaction, i) => {
         console.log(`[${i}] : ${item.title}`);
 
-        const categoryEntity = await new CreateCategoryService().execute(
+        const categoryEntity = await createCategoryService.execute(
           item.category,
         );
 
