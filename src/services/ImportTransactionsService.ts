@@ -8,13 +8,9 @@ import CreateCategoryService from './CreateCategoryService';
 
 // import AppError from '../errors/AppError';
 
-import uploadConfig from '../config/upload';
-
 class ImportTransactionsService {
-  public async execute(cvsFileName: string): Promise<string> {
+  public async execute(cvsFileName: string): Promise<Transaction[]> {
     const transactionRepository = getRepository(Transaction);
-    const categoryRepository = getRepository(Category);
-
     /*
     const transactionFilePath = path.join(uploadConfig.directory, cvsFileName);
     const transactionFileExists = await fs.promises.stat(transactionFilePath);
@@ -24,8 +20,9 @@ class ImportTransactionsService {
     }
     */
     const transactionArray: Transaction[] = await this.loadCSV(cvsFileName);
+    const transactionsArray: Transaction[] = [];
 
-    transactionArray.forEach(async (item: Transaction, i) => {
+    await transactionArray.forEach(async (item: Transaction, i) => {
       console.log(`[${i}] : ${item.title}`);
 
       const categoryEntity = await new CreateCategoryService().execute(
@@ -39,10 +36,12 @@ class ImportTransactionsService {
         category: categoryEntity,
       });
 
-      await transactionRepository.save(transaction);
+      const transactionResult = await transactionRepository.save(transaction);
+
+      transactionsArray.push(transactionResult);
     });
 
-    return 'ok';
+    return transactionsArray;
   }
 
   public async loadCSV(fileName: string): Promise<Transaction[]> {
