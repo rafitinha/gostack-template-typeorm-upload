@@ -14,7 +14,14 @@ class CategorysRepository extends Repository<Category> {
     return { income: 0, outcome: 0, total: 0 };
   }
 
-  public async produce(category: Category): Promise<Category> {
+  public async produce(item: Category): Promise<Category> {
+    let category = new Category();
+    if (item instanceof Category) {
+      category = item;
+    } else {
+      category.title = item;
+    }
+
     let categoryEntity = await this.findOne({
       where: { title: category.title },
     });
