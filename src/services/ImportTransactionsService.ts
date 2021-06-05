@@ -11,37 +11,32 @@ import CreateCategoryService from './CreateCategoryService';
 class ImportTransactionsService {
   public async execute(cvsFileName: string): Promise<Transaction[]> {
     const transactionRepository = getRepository(Transaction);
-    /*
-    const transactionFilePath = path.join(uploadConfig.directory, cvsFileName);
-    const transactionFileExists = await fs.promises.stat(transactionFilePath);
 
-    if (transactionFileExists) {
-      await fs.promises.unlink(transactionFilePath);
-    }
-    */
     const transactionArray: Transaction[] = await this.loadCSV(cvsFileName);
-    const transactionsArray: Transaction[] = [];
 
-    await transactionArray.forEach(async (item: Transaction, i) => {
-      console.log(`[${i}] : ${item.title}`);
+    const transactionsArray = transactionArray.map(
+      async (item: Transaction, i) => {
+        console.log(`[${i}] : ${item.title}`);
 
-      const categoryEntity = await new CreateCategoryService().execute(
-        item.category,
-      );
+        const categoryEntity = await new CreateCategoryService().execute(
+          item.category,
+        );
 
-      const transaction = transactionRepository.create({
-        title: item.title,
-        value: item.value,
-        type: item.type,
-        category: categoryEntity,
-      });
+        const transaction = transactionRepository.create({
+          title: item.title,
+          value: item.value,
+          type: item.type,
+          category: categoryEntity,
+        });
 
-      const transactionResult = await transactionRepository.save(transaction);
+        const transactionResult = await transactionRepository.save(transaction);
 
-      transactionsArray.push(transactionResult);
-    });
+        return transactionResult;
+      },
+    );
+    const resultado = await Promise.all(transactionsArray);
 
-    return transactionsArray;
+    return resultado;
   }
 
   public async loadCSV(fileName: string): Promise<Transaction[]> {
