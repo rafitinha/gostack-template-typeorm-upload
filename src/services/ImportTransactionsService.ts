@@ -9,6 +9,7 @@ import CreateCategoryService from './CreateCategoryService';
 // import AppError from '../errors/AppError';
 
 class ImportTransactionsService {
+  // https://medium.com/@mathiasghenoazzolini/javascript-loops-com-async-await-8b07caf38017
   public async execute(cvsFileName: string): Promise<Transaction[]> {
     const transactionRepository = getRepository(Transaction);
 
