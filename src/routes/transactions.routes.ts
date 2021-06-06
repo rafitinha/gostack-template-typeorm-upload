@@ -41,7 +41,7 @@ transactionsRouter.delete('/:id', async (request, response) => {
 
 transactionsRouter.post(
   '/import',
-  upload.single('import'),
+  upload.single('file'),
   async (request, response) => {
     const importTransactionsService = new ImportTransactionsService();
     const arrayTransactions = await importTransactionsService.execute(
