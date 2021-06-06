@@ -17,6 +17,43 @@ class ImportTransactionsService {
 
     const createCategoryService = new CreateCategoryService();
 
+    const transactionEntityArray: Transaction[] = [];
+    // https://oieduardorabelo.medium.com/javascript-armadilhas-do-asyn-await-em-loops-1cdad44db7f0
+    for (const item of transactionArray) {
+      const categoryEntity = await createCategoryService.execute(item.category);
+
+      const transaction = transactionRepository.create({
+        title: item.title,
+        value: item.value,
+        type: item.type,
+        category: categoryEntity,
+      });
+
+      const transactionResult = await transactionRepository.save(transaction);
+
+      transactionEntityArray.push(transactionResult);
+    }
+
+    /*
+    await transactionArray.forEach(async function (item, i) {
+      console.log(`[${i}] : ${item.title}`);
+
+      const categoryEntity = await createCategoryService.execute(item.category);
+
+      const transaction = transactionRepository.create({
+        title: item.title,
+        value: item.value,
+        type: item.type,
+        category: categoryEntity,
+      });
+
+      const transactionResult = await transactionRepository.save(transaction);
+
+      transactionEntityArray.push(transactionResult);
+    });
+   */
+
+    /*
     const transactionsArray = transactionArray.map(
       async (item: Transaction, i) => {
         console.log(`[${i}] : ${item.title}`);
@@ -37,9 +74,11 @@ class ImportTransactionsService {
         return transactionResult;
       },
     );
-    const resultado = await Promise.all(transactionsArray);
 
-    return resultado;
+    const resultado = await Promise.all(transactionsArray);
+    */
+
+    return transactionEntityArray;
   }
 
   public async loadCSV(fileName: string): Promise<Transaction[]> {
